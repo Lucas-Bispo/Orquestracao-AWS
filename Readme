@@ -72,3 +72,4 @@ Instale as dependências:
 Bash
 
 pip install -r requirements.txt
+
