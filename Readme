@@ -1,0 +1,74 @@
+Orquestração AWS (Orquestracao-AWS)
+Ferramenta para automação do processo de onboarding e auditoria inicial de ambientes de clientes na nuvem AWS.
+
+Visão Geral
+Como Arquitetos de Soluções AWS, o processo de iniciar um novo projeto com um cliente envolve tarefas repetitivas e cruciais, como analisar o ambiente existente, documentar os recursos e identificar pontos de otimização. Este projeto visa automatizar e padronizar essas tarefas.
+
+A Orquestracao-AWS é uma ferramenta de linha de comando (CLI) em Python que, ao receber o nome de um novo cliente, cria uma estrutura de projeto organizada e executa uma série de scripts para extrair informações vitais da conta AWS do cliente. Todos os dados coletados são exportados de forma organizada para planilhas Excel (.xlsx), facilitando a análise e a criação de relatórios de arquitetura.
+
+Principais Funcionalidades
+Onboarding Automatizado: Criação de uma estrutura de pastas padronizada para cada novo cliente.
+
+Gestão Segura de Credenciais: Utiliza perfis da AWS CLI para acesso às contas, evitando o armazenamento de chaves de acesso (Access Keys) no código.
+
+Extração Modular de Dados: Scripts organizados por serviço (IAM, EC2, S3, RDS, VPC, etc.) que podem ser facilmente estendidos.
+
+Exportação para Excel: Todos os dados coletados são salvos em arquivos .xlsx, onde cada serviço pode ter sua própria planilha e diferentes abas (sheets) para diferentes tipos de recursos.
+
+Arquitetura Extensível: Projetado com princípios de Orientação a Objetos para permitir que novos "extratores" de serviços sejam adicionados com o mínimo de esforço.
+
+Arquitetura do Projeto
+O projeto é construído sobre uma arquitetura modular e orientada a objetos para garantir manutenibilidade e escalabilidade.
+
+main.py: Ponto de entrada da aplicação. Gerencia a interação com o usuário e orquestra o fluxo de trabalho.
+
+ClientManager: Classe responsável por criar, carregar e gerenciar as configurações dos clientes.
+
+AWSConnector: Classe que estabelece a conexão com a AWS de forma segura usando o perfil do cliente.
+
+Extractors: Módulos especializados, onde cada um é responsável por um serviço da AWS (ex: EC2Extractor, S3Extractor). Eles herdam de uma BaseExtractor que define a interface padrão.
+Estrutura de Pastas
+Orquestracao-AWS/
+│
+├── clients/                # Dados e saídas de cada cliente
+│   ├── nome_do_cliente/
+│   │   ├── config.ini      # Configurações do cliente (ex: perfil AWS)
+│   │   └── output/
+│   │       ├── iam_report.xlsx
+│   │       ├── ec2_report.xlsx
+│   │       └── s3_report.xlsx
+│
+├── src/                    # Código fonte do projeto
+│   ├── client_manager.py
+│   ├── aws_connector.py
+│   └── extractors/
+│       ├── base_extractor.py
+│       ├── ec2_extractor.py
+│       └── s3_extractor.py
+│
+├── main.py                 # Script principal
+├── config.ini              # Configuração geral (ex: quais extratores rodar)
+├── requirements.txt        # Dependências Python
+└── README.md               # Esta documentação
+Como Usar
+Pré-requisitos
+Python 3.8+
+
+AWS CLI instalado e configurado.
+
+Instalação
+Clone o repositório:
+
+Bash
+
+git clone https://github.com/seu-usuario/Orquestracao-AWS.git
+Navegue até o diretório do projeto:
+
+Bash
+
+cd Orquestracao-AWS
+Instale as dependências:
+
+Bash
+
+pip install -r requirements.txt
