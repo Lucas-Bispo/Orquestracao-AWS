@@ -4,6 +4,3 @@ boto3
 # Para manipulação de dados e exportação para Excel
 pandas
 openpyxl
-
-# Para carregar variáveis de ambiente de um arquivo .env
-python-dotenv
