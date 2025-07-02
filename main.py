@@ -1,10 +1,12 @@
 import os
 import sys
-import getpass
+# A biblioteca 'getpass' não é mais necessária, pois usaremos 'input'
+# import getpass 
 
 # Importando as classes que criamos
 from src.aws_connector import AWSConnector
 from src.extractors.iam_extractor import IAMExtractor
+from src.extractors.vpc_extractor import VPCExtractor
 from src.report_generator import ReportGenerator
 
 def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_name):
@@ -16,7 +18,7 @@ def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_n
     print("-" * 50)
 
     try:
-        # 1. Conectar à AWS com as credenciais fornecidas
+        # 1. Conectar à AWS
         connector = AWSConnector(
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
@@ -25,7 +27,10 @@ def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_n
         aws_session = connector.get_session()
 
         # 2. Preparar extratores e coletar dados
-        extractors = [IAMExtractor()]
+        extractors = [
+            IAMExtractor(), 
+            VPCExtractor()  # <<< 2. ADICIONE À LISTA
+        ]
         all_extracted_data = {}
 
         for extractor in extractors:
@@ -63,7 +68,12 @@ if __name__ == "__main__":
 
         # 2. Pergunta as credenciais de forma interativa
         access_key_input = input("Digite seu AWS Access Key ID: ")
-        secret_key_input = getpass.getpass("Digite seu AWS Secret Access Key: ") # A digitação ficará oculta
+
+        # --- MUDANÇA PRINCIPAL AQUI ---
+        # Trocamos getpass.getpass() por input() para resolver o problema de travamento no terminal.
+        print("\n!!! AVISO: A Chave Secreta ficará VISÍVEL na tela durante a digitação. !!!")
+        secret_key_input = input("Digite seu AWS Secret Access Key: ")
+
         region_input = input("Digite a Região da AWS (ex: us-east-1): ")
 
         if not all([client_name_input, access_key_input, secret_key_input, region_input]):
