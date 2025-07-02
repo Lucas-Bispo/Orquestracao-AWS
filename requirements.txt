@@ -1,0 +1,6 @@
+# SDK da AWS para Python
+boto3
+
+# Para manipulação de dados e exportação para Excel
+pandas
+openpyxl
