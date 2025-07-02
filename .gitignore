@@ -1,0 +1,20 @@
+# Arquivos de ambiente - NUNCA ENVIE PARA O REPOSITÓRIO!
+.env
+
+# Dependências e ambientes virtuais
+venv/
+/venv
+*.egg-info/
+dist/
+build/
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos de IDE e sistema operacional
+.vscode/
+.idea/
+.DS_Store
