@@ -1,12 +1,13 @@
 import os
-from dotenv import load_dotenv
+import sys
+import getpass
 
 # Importando as classes que criamos
 from src.aws_connector import AWSConnector
 from src.extractors.iam_extractor import IAMExtractor
 from src.report_generator import ReportGenerator
 
-def run_analysis(client_name, aws_profile):
+def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_name):
     """
     Função principal que orquestra a análise para um cliente.
     """
@@ -15,8 +16,12 @@ def run_analysis(client_name, aws_profile):
     print("-" * 50)
 
     try:
-        # 1. Conectar à AWS
-        connector = AWSConnector(profile_name=aws_profile)
+        # 1. Conectar à AWS com as credenciais fornecidas
+        connector = AWSConnector(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            region_name=region_name
+        )
         aws_session = connector.get_session()
 
         # 2. Preparar extratores e coletar dados
@@ -37,27 +42,45 @@ def run_analysis(client_name, aws_profile):
         
         print("-" * 50)
         print("Orquestração finalizada com sucesso!")
+        print(f"Relatório salvo em: clients/{client_name}/output/")
         print("-" * 50)
 
     except Exception as e:
         print(f"\nOcorreu um erro fatal durante a orquestração: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    # Carrega as variáveis do arquivo .env para o ambiente
-    load_dotenv()
+    
+    print("=" * 50)
+    print("      Ferramenta de Orquestração e Análise AWS")
+    print("         (Modo de Credenciais Diretas)")
+    print("=" * 50)
 
-    # Puxa as variáveis do ambiente usando os.getenv()
-    CLIENTE_EXEMPLO = os.getenv("CLIENTE_EXEMPLO")
-    PERFIL_AWS_EXEMPLO = os.getenv("PERFIL_AWS_EXEMPLO")
+    try:
+        # 1. Pergunta o nome do cliente
+        client_name_input = input("Digite o nome do cliente (ex: EmpresaX): ")
 
-    # Verificação para garantir que as variáveis foram carregadas
-    if not CLIENTE_EXEMPLO or not PERFIL_AWS_EXEMPLO:
-        print("ERRO: As variáveis CLIENTE_EXEMPLO e PERFIL_AWS_EXEMPLO não foram encontradas.")
-        print("Por favor, crie um arquivo .env na raiz do projeto e defina essas variáveis.")
-    else:
-        # Cria a estrutura de pastas manualmente para o primeiro teste
-        os.makedirs(os.path.join('clients', CLIENTE_EXEMPLO, 'output'), exist_ok=True)
+        # 2. Pergunta as credenciais de forma interativa
+        access_key_input = input("Digite seu AWS Access Key ID: ")
+        secret_key_input = getpass.getpass("Digite seu AWS Secret Access Key: ") # A digitação ficará oculta
+        region_input = input("Digite a Região da AWS (ex: us-east-1): ")
+
+        if not all([client_name_input, access_key_input, secret_key_input, region_input]):
+            print("\nERRO: Todos os campos (cliente, chaves e região) são obrigatórios.")
+            sys.exit(1)
+
+        # Cria a estrutura de pastas para o cliente
+        os.makedirs(os.path.join('clients', client_name_input, 'output'), exist_ok=True)
         
-        # Executa a análise com as variáveis carregadas do .env
-        run_analysis(client_name=CLIENTE_EXEMPLO, aws_profile=PERFIL_AWS_EXEMPLO)
+        # Executa a análise com os dados fornecidos pelo usuário
+        run_analysis(
+            client_name=client_name_input,
+            aws_access_key_id=access_key_input,
+            aws_secret_access_key=secret_key_input,
+            region_name=region_input
+        )
+
+    except KeyboardInterrupt:
+        print("\n\nOperação cancelada pelo usuário. Encerrando.")
+        sys.exit(0)
