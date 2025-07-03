@@ -1,12 +1,11 @@
 import os
 import sys
-# A biblioteca 'getpass' não é mais necessária, pois usaremos 'input'
-# import getpass 
 
 # Importando as classes que criamos
 from src.aws_connector import AWSConnector
 from src.extractors.iam_extractor import IAMExtractor
 from src.extractors.vpc_extractor import VPCExtractor
+from src.extractors.ec2_extractor import EC2Extractor
 from src.report_generator import ReportGenerator
 
 def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_name):
@@ -18,7 +17,7 @@ def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_n
     print("-" * 50)
 
     try:
-        # 1. Conectar à AWS
+        # 1. Conectar à AWS com as credenciais fornecidas
         connector = AWSConnector(
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
@@ -29,7 +28,8 @@ def run_analysis(client_name, aws_access_key_id, aws_secret_access_key, region_n
         # 2. Preparar extratores e coletar dados
         extractors = [
             IAMExtractor(), 
-            VPCExtractor()  # <<< 2. ADICIONE À LISTA
+            VPCExtractor(),
+            EC2Extractor() 
         ]
         all_extracted_data = {}
 
@@ -68,9 +68,8 @@ if __name__ == "__main__":
 
         # 2. Pergunta as credenciais de forma interativa
         access_key_input = input("Digite seu AWS Access Key ID: ")
-
-        # --- MUDANÇA PRINCIPAL AQUI ---
-        # Trocamos getpass.getpass() por input() para resolver o problema de travamento no terminal.
+        
+        # Solução alternativa para o problema do terminal
         print("\n!!! AVISO: A Chave Secreta ficará VISÍVEL na tela durante a digitação. !!!")
         secret_key_input = input("Digite seu AWS Secret Access Key: ")
 
